@@ -1,7 +1,6 @@
 @echo off
 :: ============================================================
 ::  MANUTENCAO AUTOMATIZADA - WINDOWS 11 + SSD
-::  EXECUÇÃO TOTALMENTE AUTÔNOMA E COMENTADA
 :: ============================================================
 
 :: [AUTO-ELEVAÇÃO] Solicita permissão de administrador automaticamente
