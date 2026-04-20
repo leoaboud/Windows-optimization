@@ -1,7 +1,6 @@
 @echo off
 :: ============================================================
 ::  MANUTENCAO AUTOMATIZADA - WINDOWS 11 + HDD
-::  VERSÃO OTIMIZADA PARA DISCOS RÍGIDOS (MECÂNICOS)
 :: ============================================================
 
 :: [AUTO-ELEVAÇÃO] Solicita permissão de administrador automaticamente [cite: 1]
