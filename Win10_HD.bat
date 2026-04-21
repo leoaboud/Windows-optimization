@@ -1,109 +1,89 @@
 @echo off
 :: ============================================================
-::  MANUTENCAO AUTOMATIZADA - WINDOWS 10
+::  DEV MASTER BY ABOUD - WINDOWS 10 HDD EDITION (PROGRESS)
 :: ============================================================
 
-:: [AUTO-ELEVAÇÃO] Solicita permissão de administrador automaticamente
+:: [AUTO-ELEVAÇÃO]
 net session >nul 2>&1
 if %errorlevel% neq 0 (
     powershell -Command "Start-Process -FilePath '%0' -Verb RunAs"
     exit /b
 )
 
-title Manutencao Automatica - Windows 10 (HDD Edition)
+title DEV MASTER BY ABOUD - OTIMIZACAO WIN10 HDD
 color 0B
 
-set LOGFILE=%SystemDrive%\manutencao_win10_log.txt
-echo Manutencao iniciada em: %date% %time% > "%LOGFILE%"
-
 echo =========================================================
-echo  INICIANDO WIN PRO... POR FAVOR, AGUARDE.
+echo               DEV MASTER (WIN 10 HDD)
+echo    ESTA VERSAO INCLUI OTIMIZACAO FISICA PARA DISCO RIGIDO.
+echo    O PC SERA DESLIGADO AUTOMATICAMENTE AO FINALIZAR.
 echo =========================================================
+echo.
 
-:: [1/11] Arquivos Temporários
-echo [1/11] Limpando arquivos temporarios...
-echo Objetivo: Remover lixo digital que ocupa espaco e reduz a velocidade do sistema.
-del /s /f /q "%TEMP%\*.*" >nul 2>&1
-rd /s /q "%TEMP%" >nul 2>&1
-md "%TEMP%" >nul 2>&1
-del /s /f /q "C:\Windows\Temp\*.*" >nul 2>&1
-rd /s /q "C:\Windows\Temp" >nul 2>&1
-md "C:\Windows\Temp" >nul 2>&1
-echo [OK] >> "%LOGFILE%"
+:: Variável para a barra de progresso via PowerShell
+set "PS_PROGRESS=powershell -NoProfile -ExecutionPolicy Bypass -Command "Write-Progress -Activity 'DEV MASTER (WIN 10 HDD)' -Status"
 
-:: [2/11] Prefetch
-echo [2/11] Limpando cache de inicializacao (Prefetch)...
-echo Objetivo: Forcar o Windows a recriar o mapa de carregamento de apps para evitar erros.
-del /s /f /q "C:\Windows\Prefetch\*.*" >nul 2>&1
-echo [OK] >> "%LOGFILE%"
-
-:: [3/11] DNS
-echo [3/11] Limpando cache de DNS...
-echo Objetivo: Corrigir problemas de conexao com sites e erros de navegador.
+:: [1/12] DNS
+%PS_PROGRESS% 'Limpando DNS (1/12)' -PercentComplete 8"
 ipconfig /flushdns >nul 2>&1
-echo [OK] >> "%LOGFILE%"
 
-:: [4/11] Miniaturas
-echo [4/11] Resetando cache de miniaturas (Thumbnails)...
-echo Objetivo: Corrigir erro de icones que nao aparecem ou pastas lentas ao abrir.
+:: [2/12] Rede e Energia (Hibernação ON para HDDs)
+%PS_PROGRESS% 'Ajustando Rede e Energia (2/12)' -PercentComplete 16"
+netsh winsock reset >nul 2>&1
+powercfg -h on >nul 2>&1
+powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
+
+:: [3/12] Reset de Drivers
+%PS_PROGRESS% 'Reiniciando Drivers de Video/Audio (3/12)' -PercentComplete 25"
+powershell -Command "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class Monitor { [DllImport(\"user32.dll\")] public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam); }'; [Monitor]::SendMessage(-1, 0x0112, 0xF170, 2)" >nul 2>&1
+timeout /t 2 >nul
+powershell -Command "[Monitor]::SendMessage(-1, 0x0112, 0xF170, -1)" >nul 2>&1
+
+:: [4/12] Miniaturas
+%PS_PROGRESS% 'Limpando Cache de Icones (4/12)' -PercentComplete 33"
 taskkill /f /im explorer.exe >nul 2>&1
 del /f /s /q "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" >nul 2>&1
-start explorer.exe
-echo [OK] >> "%LOGFILE%"
+start explorer.exe >nul 2>&1
 
-:: [5/11] Cleanmgr
-echo [5/11] Executando Limpeza de Disco do Windows...
-echo Objetivo: Remocao de instalacoes anteriores e arquivos de sistema obsoletos.
-cleanmgr /sagerun:1
-echo [OK] >> "%LOGFILE%"
+:: [5/12] Logs
+%PS_PROGRESS% 'Limpando Logs de Eventos (5/12)' -PercentComplete 41"
+for /F "tokens=*" %%G in ('wevtutil el') do (wevtutil cl "%%G") >nul 2>&1
 
-:: [6/11] WinSxS
-echo [6/11] Limpando arquivos antigos do Windows Update (WinSxS)...
-echo Objetivo: Recuperar muito espaco em disco removendo sobras de atualizacoes.
-Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
-echo [OK] >> "%LOGFILE%"
+:: [6/12] Temporários
+%PS_PROGRESS% 'Limpando Arquivos Temporarios (6/12)' -PercentComplete 50"
+del /s /f /q "%TEMP%\*.*" >nul 2>&1
+del /s /f /q "C:\Windows\Temp\*.*" >nul 2>&1
 
-:: [7/11] MS Store
-echo [7/11] Resetando cache da Windows Store...
-echo Objetivo: Resolver bugs na loja e em aplicativos nativos do Windows 10.
-wsreset.exe
-echo [OK] >> "%LOGFILE%"
+:: [7/12] Prefetch
+%PS_PROGRESS% 'Resetando Cache Prefetch (7/12)' -PercentComplete 58"
+del /s /f /q "C:\Windows\Prefetch\*.*" >nul 2>&1
 
-:: [8/11] Integridade SFC + DISM
-echo [8/11] Verificando e reparando a saude do sistema...
-echo Objetivo: Corrigir automaticamente arquivos corrompidos que causam travamentos.
-DISM /Online /Cleanup-Image /RestoreHealth
-sfc /scannow
-echo [OK] >> "%LOGFILE%"
+:: [8/12] Winget
+%PS_PROGRESS% 'Atualizando Apps via Winget (8/12)' -PercentComplete 66"
+winget upgrade --all --include-unknown --accept-package-agreements --accept-source-agreements >nul 2>&1
 
-:: [9/11] Atualizacoes Winget (Se disponivel)
-echo [9/11] Atualizando programas instalados...
-echo Objetivo: Manter seus apps na ultima versao de forma silenciosa.
-winget upgrade --all --silent --include-unknown >nul 2>&1
-echo [OK] >> "%LOGFILE%"
+:: [9/12] SFC
+%PS_PROGRESS% 'Validando Arquivos de Sistema (9/12)' -PercentComplete 75"
+sfc /scannow >nul 2>&1
 
-:: [10/11] Logs de Eventos
-echo [10/11] Limpando logs de eventos antigos...
-echo Objetivo: Liberar espaco e limpar o historico de erros do Visualizador de Eventos.
-wevtutil cl Application >nul 2>&1
-wevtutil cl System >nul 2>&1
-wevtutil cl Security >nul 2>&1
-echo [OK] >> "%LOGFILE%"
+:: [10/12] WinSxS
+%PS_PROGRESS% 'Otimizando Nucleo (10/12)' -PercentComplete 83"
+Dism.exe /online /Cleanup-Image /StartComponentCleanup >nul 2>&1
 
-:: [11/11] Rede e Energia
-echo [11/11] Otimizando Rede e Perfil de Energia...
-echo Objetivo: Resetar rede (IP/Winsock) e ativar o modo de Alto Desempenho.
-netsh winsock reset >nul 2>&1
-powercfg -h off >nul 2>&1
-powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
-echo [OK] >> "%LOGFILE%"
+:: [11/12] DISM Final
+%PS_PROGRESS% 'Consolidando Limpeza Profunda (11/12)' -PercentComplete 91"
+Dism.exe /online /Cleanup-Image /StartComponentCleanup /NoRestart >nul 2>&1
+
+:: [12/12] DESFRAGMENTAÇÃO (Crucial para HDD)
+%PS_PROGRESS% 'DESFRAGMENTANDO DISCO FISICO (12/12)' -PercentComplete 100"
+defrag C: /U /V >nul 2>&1
 
 echo.
 echo =========================================================
-echo  MANUTENCAO CONCLUIDA!
-echo  O computador sera desligado em 10 segundos.
-echo  Pressione CTRL+C para cancelar o desligamento.
+echo    DEV MASTER - CONCLUIDO COM SUCESSO!
+echo    O PC desligara em 10 segundos.
+echo    Pressione CTRL+C para cancelar o desligamento.
 echo =========================================================
 
+shutdown /s /t 10 /c "Manutencao DEV MASTER (Win10 HDD) finalizada."
 timeout /t 10
-shutdown /s /t 0 /c "Manutencao completa do Windows 10 finalizada."
