@@ -10,14 +10,14 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-title Manutencao Automatica - Windows 10 (SSD)
+title Manutencao Automatica - Windows 10 (SSD Edition)
 color 0B
 
 set LOGFILE=%SystemDrive%\manutencao_win10_ssd_log.txt
 echo Manutencao iniciada em: %date% %time% > "%LOGFILE%"
 
 echo =========================================================
-echo  INICIANDO MANUTENCAO WINDOWS 10 (SSD)... AGUARDE.
+echo  INICIANDO WIN PRO... POR FAVOR, AGUARDE.
 echo =========================================================
 
 :: [1/11] Limpeza de Arquivos Temporários

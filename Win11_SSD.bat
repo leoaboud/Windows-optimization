@@ -10,14 +10,14 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-title Manutencao Automatica - Windows 11
+title Manutencao Automatica - Windows 11 (SSD Edition)
 color 0A
 
 set LOGFILE=%SystemDrive%\manutencao_log.txt
 echo Manutencao iniciada em: %date% %time% > "%LOGFILE%"
 
 echo =========================================================
-echo  INICIANDO MANUTENCAO... POR FAVOR, AGUARDE.
+echo  INICIANDO WIN PRO... POR FAVOR, AGUARDE.
 echo =========================================================
 
 :: [1/12] Arquivos Temporários
